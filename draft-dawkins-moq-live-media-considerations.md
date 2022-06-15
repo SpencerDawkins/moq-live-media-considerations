@@ -74,7 +74,7 @@ informative:
     target: https://www.ietf.org/mailman/listinfo/moq
     title: "Moq -- Media over QUIC"
   MOQ-BOF-request-114:
-    target: https://datatracker.ietf.org/wg/moq/about/
+    target: https://datatracker.ietf.org/doc/bofreq-hardie-media-over-quic/
     title: "Media over QUIC -- IETF 114 BOF Request"
   MOQ-ml:
     target: https://www.ietf.org/mailman/listinfo/moq
@@ -160,7 +160,8 @@ Within this document, the term "Media Transport Protocol" is used to describe to
 
 where
 
-* "Media Format" would be something like an RTP payload format {{RFC2736}} or ISOBMFF {{ISOBMFF}},
+* "Media" would be something like the output of a codec, or other media sources such as closed-captioning,
+* "Media Format" would be something like an RTP payload format {{RFC2736}} or ISOBMFF {{ISOBMFF}} profiles,
 * "Media Transport Protocol" would be something like RTP or DASH {{MPEG-DASH}}, and
 * "Transport Protocol" would be a protocol that provides appropriate transport services, as described in Section 5 of {{RFC8095}}.
 
@@ -245,6 +246,8 @@ it would be beneficial for a protocol to provide such an opportunity (e.g. RTP/Q
 ## Other Considerations
 
 ### Architecture and Workflows
+
+The proposed MOQ BOF request {{MOQ-BOF-request-114}} makes a reference to "The MOQ architecture". Is there a starting point for this? {{MOQ-uco-113}}, and other presentations at the IETF 113 BOF used a three-level workflow (from ingest, to syndication, to distribution). The 
 
 We talked about complete workflows - does it look like the proposed charter et. al just assumes you can use the same mechanism for syndication and for streaming? Do we agree with that?
 
