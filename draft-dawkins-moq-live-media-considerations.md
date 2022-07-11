@@ -161,7 +161,7 @@ Within this document, the term "Media Transport Protocol" is used to describe to
 where
 
 * "Media" would be something like the output of a codec, or other media sources such as closed-captioning,
-* "Media Format" would be something like an RTP payload format {{RFC2736}} or ISOBMFF {{ISOBMFF}} profiles,
+* "Media Format" would be something like an RTP payload format {{RFC2736}} or an ISOBMFF {{ISOBMFF}} profile,
 * "Media Transport Protocol" would be something like RTP or DASH {{MPEG-DASH}}, and
 * "Transport Protocol" would be a protocol that provides appropriate transport services, as described in Section 5 of {{RFC8095}}.
 
@@ -203,7 +203,9 @@ the start of the session.
 
 ### Appropriate Congestion Control {#acc}
 
-This should be about how a QUIC endpoint knows what congestion control is appropropriate - QUIC signaling, port numbers, APLN, etc.
+The proposed MOQ charter {{MOQ-BOF-request-114}} is silent on the question of appropriate congestion control mechanisms for MOQ. If new congestion control mechanisms are required, they are unlikely to be in scope for a MOQ working group. 
+
+A question that should be in scope is how a QUIC endpoint knows what congestion control is appropropriate for a QUIC connection carrying MOQ media. A variety of potential mechanisms are possible - QUIC signaling, port numbers, APLN, etc. - but need further investigation within MOQ. 
 
 ### Support Lossless and Lossy Media Transport
 
