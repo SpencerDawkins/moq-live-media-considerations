@@ -1,0 +1,630 @@
+
+
+
+
+Media Over QUIC                                               S. Dawkins
+Internet-Draft                                       Tencent America LLC
+Intended status: Informational                         24 September 2024
+Expires: 28 March 2025
+
+
+               Media Over QUIC: Live Media Considerations
+           draft-dawkins-moq-live-media-considerations-latest
+
+Abstract
+
+   This document describes considerations for protocol design within the
+   "Media Over QUIC" umbrella.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://SpencerDawkins.github.io/moq-live-media-considerations/draft-
+   dawkins-moq-live-media-considerations.html.  Status information for
+   this document may be found at https://datatracker.ietf.org/doc/draft-
+   dawkins-moq-live-media-considerations/.
+
+   Discussion of this document takes place on the Media Over QUIC
+   Working Group mailing list (mailto:moq@ietf.org), which is archived
+   at https://mailarchive.ietf.org/arch/browse/moq/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/moq/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/SpencerDawkins/moq-live-media-considerations.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 28 March 2025.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Relationship of This Document With
+           I-D.draft-gruessing-moq-requirements
+     1.2.  For The Impatient Reader
+   2.  Conventions and Definitions
+   3.  Terminology
+   4.  Considerations for Protocol Work
+     4.1.  Here Be Dragons
+     4.2.  Media Transport Protocols and Transport Protocols
+     4.3.  Considerations for Media and Media Format
+       4.3.1.  Codec Agility
+       4.3.2.  Authentication
+     4.4.  Considerations for Media Transport Protocols (#sec-mtp}
+       4.4.1.  Flow Directionality
+     4.5.  Considerations for Transport Protocols Used For Media
+           (@sec-transport}
+       4.5.1.  Appropriate Congestion Control
+       4.5.2.  Support Lossless and Lossy Media Transport
+       4.5.3.  WebTransport
+       4.5.4.  Migration of Sessions and Multipath
+       4.5.5.  NAT Traversal
+       4.5.6.  Multicast
+     4.6.  Other Considerations
+       4.6.1.  Architecture and Workflows
+       4.6.2.  Support an Appropriate Range of Latencies
+   5.  IANA Considerations
+   6.  Security Considerations
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
+   Appendix A.  Security Considerations
+   Appendix B.  IANA Considerations
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   This document describes considerations for protocol design within the
+   "Media Over QUIC" umbrella.
+
+   At the time of writing, various proposals for "Media over QUIC" have
+   been discussed on the MOQ mailing list ((MOQ-ml}}, and at a non-
+   working-group-forming BOF at IETF 113 [MOQ-BOF-113].
+
+   One outcome of the IETF 113 BOF was a request for a working-group-
+   forming BOF at IETF 114, which has been approved
+   [MOQ-BOF-request-114].
+
+   The purpose of this document is to describe protocol considerations
+   that, while important, aren't likely to be described in a charter.
+
+1.1.  Relationship of This Document With
+      [I-D.draft-gruessing-moq-requirements]
+
+   This document started life as a section in I-D.draft-gruessing-moq-
+   requirements, which was moved into its own document to allow ease of
+   discussion for both documents.
+
+   Careful readers of Sections 4 and 5 in
+   [I-D.draft-gruessing-moq-requirements] will note that draft drew a
+   fairly sharp line between interactive media use cases and live media
+   use cases.  As of this writing, both are in scope for the proposed
+   MOQ Charter [MOQ-BOF-request-114], which is reflected in the
+   discussion of considerations for protocol design.
+
+1.2.  For The Impatient Reader
+
+   *  Our proposal is to focus on live media use cases, as described in
+      "propscope", rather than on interactive media use cases or on-
+      demand use cases.
+
+   *  The reasoning behind this proposal can be found in "analy-
+      interact".
+
+   *  The considerations for protocol work to satisfy the proposed use
+      cases can be found in Section 4.
+
+   Most of the rest of this document provides background for these
+   sections.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Terminology
+
+4.  Considerations for Protocol Work
+
+   This document is intended to "up-level" the conversation beyond
+   specific protocols, so that we can more likely agree on what is
+   important for protocol design work.
+
+4.1.  Here Be Dragons
+
+   This focument is Spencer's understanding of discussions that have
+   taken place on the MOQ mailing list [MOQ-ml], at the MOQ BOF at IETF
+   113 [MOQ-BOF-113], and in side meetings and conversations.  Spencer
+   could have misunderstood any part of this, and would love to be
+   corrected if he is confused.
+
+4.2.  Media Transport Protocols and Transport Protocols
+
+   Within this document, the term "Media Transport Protocol" is used to
+   describe to describe the protocol that carries media metadata and
+   media in its payload, and the term "Transport Protocol" describes a
+   protocol that carries a Media Transport Protocol, or another
+   Transport Protocol, in its payload.  This is easier to understand if
+   the reader assumes a protocol stack that looks something like this:
+
+                  Media
+       ---------------------------
+              Media Format
+       ---------------------------
+         Media Transport Protocol
+       ---------------------------
+          Transport Protocol(s)
+
+   where
+
+   *  "Media" would be something like the output of a codec, or other
+      media sources such as closed-captioning,
+
+   *  "Media Format" would be something like an RTP payload format
+      [RFC2736] or an ISOBMFF [ISOBMFF] profile,
+
+   *  "Media Transport Protocol" would be something like RTP or DASH
+      [MPEG-DASH], and
+
+   *  "Transport Protocol" would be a protocol that provides appropriate
+      transport services, as described in Section 5 of [RFC8095].
+
+   Not all possible streaming media applications follow this model, but
+   for the ones that do, it seems useful to have names for the protocol
+   layers between Media Format and Transport Layer
+
+   It is worth noting explicitly that the Transport Protocol layer might
+   include more than one protocol.  For example, a specific Media
+   Transport Protocol might run over HTTP, or over WebTransport, which
+   in turn runs over HTTP.
+
+   It is worth noting explicitly that more complex network protocol
+   stacks are certainly possible - for instance, packets with this
+   protocol stack may be carried in a tunnel, or in a VPN.  That's
+   something to keep in mind, but shouldn't affect the MOQ protocol
+   work.
+
+4.3.  Considerations for Media and Media Format
+
+4.3.1.  Codec Agility
+
+   When initiating a media session, both the sender and receiver will
+   need to agree on the codecs, bitrates, resolution, and other media
+   details based on capabilities and preferences.  This agreement needs
+   to take place before commencing media transmission, but might also
+   take place during media transmission, perhaps as a result of changes
+   to device output or network conditions (such as reduction in
+   available network bandwidth).
+
+   It may be prefered to use existing ecosystem for such purposes, e.g.
+   SDP [RFC4566].
+
+   I think the question(s) whether "MOQ protocol" output will be more
+   like SIP/SHIP, more like SDP, or both(?) - and that's ignoring the
+   architecture work mentioned later
+
+4.3.2.  Authentication
+
+   In order to allow hosts to authenticate one another, capabilities
+   beyond what QUIC provides may be necessary.  This should be kept
+   simple but robust in nature to prevent attacks like credential brute-
+   forcing.
+
+   TODO: More details are required here
+
+4.4.  Considerations for Media Transport Protocols (#sec-mtp}
+
+4.4.1.  Flow Directionality
+
+   Media should be able to flow in either direction from client to
+   server or vice-versa, either individually or concurrently but should
+   only be negotiated at the start of the session.
+
+4.5.  Considerations for Transport Protocols Used For Media (@sec-
+      transport}
+
+4.5.1.  Appropriate Congestion Control
+
+   The proposed MOQ charter [MOQ-BOF-request-114] is silent on the
+   question of appropriate congestion control mechanisms for MOQ.  If
+   new congestion control mechanisms are required, they are unlikely to
+   be in scope for a MOQ working group.
+
+   A question that should be in scope is how a QUIC endpoint knows what
+   congestion control is appropropriate for a QUIC connection carrying
+   MOQ media.  A variety of potential mechanisms are possible - QUIC
+   signaling, port numbers, APLN, etc. - but need further investigation
+   within MOQ.
+
+4.5.2.  Support Lossless and Lossy Media Transport
+
+   TODO: confirm scope of MOQ to describe lossless media transport,
+   lossy media transport, or both lossless and lossy transport.
+
+   This MAY be a way to get at "interactive" and "live" without arguing
+   with Cullen endlessly about whether Meetecho is interactive (insert
+   emoticon)
+
+4.5.3.  WebTransport
+
+   I think this ship has sailed (the answer is "yes"), which gives us
+   new and exciting questions about supported protocol stacks.
+
+   *  WebTransport supports HTTP/2, are we going to explicitly exclude
+      it?
+
+   *  Also, WebTransport [I-D.draft-ietf-webtrans-overview] has
+      normative language around congestion control, which may be at odds
+      with the considerations described in Section 4.5.1.
+
+4.5.4.  Migration of Sessions and Multipath
+
+   Handling of migration of a session between hosts, either of sender or
+   receiver should be supported.  This may either happen because the
+   sender is undergoing maintenence or a rebalancing of resource,
+   because the either is experiencing a change in network connectivity
+   (such as a device moving from WiFi to cellular connectivity) or other
+   reasons.
+
+   This may depend on QUIC capabilities such as
+   [I-D.draft-ietf-quic-multipath] but support for full QUIC operation
+   over multiple paths between senders and receivers is by no means
+   essential.If we're doing QUIC, we OUGHT to be getting these,
+   relatively, for free.
+
+4.5.5.  NAT Traversal
+
+   This one's probably still relevant, depending on the answer to
+   Section 4.3.1 and a bunch of other answers.
+
+4.5.6.  Multicast
+
+   I don't see this making the cut in the first approved MOQ charter, do
+   you?
+
+   Even if multicast and other network broadcasting capabilities are
+   often used in delivering media in our use cases, QUIC doesn't yet
+   support multicast, and a QUIC protocol extension would be needed to
+   do so.  In addition, the inclusion of multicast would introduce more
+   complexity in both the specification and client implimentations.  On
+   the other hand, UDP multicast may be considered as the last mile
+   delivery transport outside of QUIC transport, thus it would be
+   beneficial for a protocol to provide such an opportunity (e.g.  RTP/
+   QUIC -> RTP/UDP).
+
+4.6.  Other Considerations
+
+4.6.1.  Architecture and Workflows
+
+   The proposed MOQ BOF request [MOQ-BOF-request-114] makes a reference
+   to "The MOQ architecture".  Is there a starting point for this?
+   [MOQ-uco-113], and other presentations at the IETF 113 BOF used a
+   three-level workflow (from ingest, to syndication, to distribution).
+   The
+
+   We talked about complete workflows - does it look like the proposed
+   charter et. al just assumes you can use the same mechanism for
+   syndication and for streaming?  Do we agree with that?
+
+   Need to talk about "number of media sources", and especially the
+   difference between 1:m and n:m topologies.
+
+4.6.2.  Support an Appropriate Range of Latencies
+
+   We said we were going to name numbers, rather than labels, right?
+
+   I think where MOQ is headed, is that they are going to TRY to support
+   everything, and if you can't support an appropriate latency for your
+   use case, that's Simply A Matter Of Network Engineering.
+
+   Should "on demand" be a thing?
+
+   Key point here isn't just one-way-delay, it's also return-path
+   latency.
+
+5.  IANA Considerations
+
+   This document makes no requests of IANA.
+
+6.  Security Considerations
+
+   As this document is intended to guide discussion and consensus, it
+   introduces no security considerations of its own.
+
+   Protocol Specifications that reflect those discussions would contain
+   their own relevant security considerations.
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+7.2.  Informative References
+
+   [AVTCORE-2022-02]
+              "AVTCORE 2022-02 interim meeting materials", February
+              2022, <https://datatracker.ietf.org/meeting/interim-2022-
+              avtcore-01/session/avtcore>.
+
+   [I-D.draft-cardwell-iccrg-bbr-congestion-control]
+              Cardwell, N., Cheng, Y., Yeganeh, S. H., Swett, I., and V.
+              Jacobson, "BBR Congestion Control", Work in Progress,
+              Internet-Draft, draft-cardwell-iccrg-bbr-congestion-
+              control-02, 7 March 2022,
+              <https://datatracker.ietf.org/doc/html/draft-cardwell-
+              iccrg-bbr-congestion-control-02>.
+
+   [I-D.draft-engelbart-rtp-over-quic]
+              Ott, J. and M. Engelbart, "RTP over QUIC", Work in
+              Progress, Internet-Draft, draft-engelbart-rtp-over-quic-
+              04, 24 June 2022, <https://datatracker.ietf.org/doc/html/
+              draft-engelbart-rtp-over-quic-04>.
+
+   [I-D.draft-gruessing-moq-requirements]
+              Gruessing, J. and S. Dawkins, "Media Over QUIC - Use Cases
+              and Requirements for Media Transport Protocol Design",
+              Work in Progress, Internet-Draft, draft-gruessing-moq-
+              requirements-05, 30 May 2023,
+              <https://datatracker.ietf.org/doc/html/draft-gruessing-
+              moq-requirements-05>.
+
+   [I-D.draft-hurst-quic-rtp-tunnelling]
+              Hurst, S., "QRT: QUIC RTP Tunnelling", Work in Progress,
+              Internet-Draft, draft-hurst-quic-rtp-tunnelling-01, 28
+              January 2021, <https://datatracker.ietf.org/doc/html/
+              draft-hurst-quic-rtp-tunnelling-01>.
+
+   [I-D.draft-ietf-mops-streaming-opcons]
+              Holland, J., Begen, A. C., and S. Dawkins, "Operational
+              Considerations for Streaming Media", Work in Progress,
+              Internet-Draft, draft-ietf-mops-streaming-opcons-12, 8
+              August 2022, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-mops-streaming-opcons-12>.
+
+   [I-D.draft-ietf-quic-datagram]
+              Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", Work in Progress, Internet-
+              Draft, draft-ietf-quic-datagram-10, 4 February 2022,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              datagram-10>.
+
+   [I-D.draft-ietf-quic-http]
+              Bishop, M., "HTTP/3", Work in Progress, Internet-Draft,
+              draft-ietf-quic-http-34, 2 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              http-34>.
+
+   [I-D.draft-ietf-quic-multipath]
+              Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
+              C., and M. Kühlewind, "Multipath Extension for QUIC", Work
+              in Progress, Internet-Draft, draft-ietf-quic-multipath-10,
+              8 July 2024, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-quic-multipath-10>.
+
+   [I-D.draft-ietf-webtrans-overview]
+              Vasiliev, V., "The WebTransport Protocol Framework", Work
+              in Progress, Internet-Draft, draft-ietf-webtrans-overview-
+              08, 25 August 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              webtrans-overview-08>.
+
+   [I-D.draft-jennings-moq-quicr-arch]
+              Jennings, C. F. and S. Nandakumar, "QuicR - Media Delivery
+              Protocol over QUIC", Work in Progress, Internet-Draft,
+              draft-jennings-moq-quicr-arch-01, 11 July 2022,
+              <https://datatracker.ietf.org/doc/html/draft-jennings-moq-
+              quicr-arch-01>.
+
+   [I-D.draft-jennings-moq-quicr-proto]
+              Jennings, C. F., Nandakumar, S., and C. Huitema, "QuicR -
+              Media Delivery Protocol over QUIC", Work in Progress,
+              Internet-Draft, draft-jennings-moq-quicr-proto-01, 11 July
+              2022, <https://datatracker.ietf.org/doc/html/draft-
+              jennings-moq-quicr-proto-01>.
+
+   [I-D.draft-kpugin-rush]
+              Pugin, K., Frindell, A., Ferret, J. C., and J. Weissman,
+              "RUSH - Reliable (unreliable) streaming protocol", Work in
+              Progress, Internet-Draft, draft-kpugin-rush-02, 10 May
+              2023, <https://datatracker.ietf.org/doc/html/draft-kpugin-
+              rush-02>.
+
+   [I-D.draft-lcurley-warp]
+              Curley, L., Pugin, K., Nandakumar, S., and V. Vasiliev,
+              "Warp - Live Media Transport over QUIC", Work in Progress,
+              Internet-Draft, draft-lcurley-warp-04, 13 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-lcurley-warp-
+              04>.
+
+   [I-D.draft-rtpfolks-quic-rtp-over-quic]
+              Ott, J., Even, R., Perkins, C., and V. Singh, "RTP over
+              QUIC", Work in Progress, Internet-Draft, draft-rtpfolks-
+              quic-rtp-over-quic-01, 1 September 2017,
+              <https://datatracker.ietf.org/doc/html/draft-rtpfolks-
+              quic-rtp-over-quic-01>.
+
+   [I-D.draft-sharabayko-srt]
+              Sharabayko, M., Sharabayko, M., Dube, J., Kim, J., and J.
+              Kim, "The SRT Protocol", Work in Progress, Internet-Draft,
+              draft-sharabayko-srt-01, 7 September 2021,
+              <https://datatracker.ietf.org/doc/html/draft-sharabayko-
+              srt-01>.
+
+   [I-D.draft-sharabayko-srt-over-quic]
+              Sharabayko, M. and M. Sharabayko, "Tunnelling SRT over
+              QUIC", Work in Progress, Internet-Draft, draft-sharabayko-
+              srt-over-quic-00, 28 July 2021,
+              <https://datatracker.ietf.org/doc/html/draft-sharabayko-
+              srt-over-quic-00>.
+
+   [ISOBMFF]  "ISO/IEC 14496-12:2022 Information technology — Coding of
+              audio-visual objects — Part 12: ISO base media file
+              format", January 2022,
+              <https://www.iso.org/standard/83102.html>.
+
+   [MOQ-BOF-113]
+              "Moq -- Media over QUIC", n.d.,
+              <https://www.ietf.org/mailman/listinfo/moq>.
+
+   [MOQ-BOF-request-114]
+              "Media over QUIC -- IETF 114 BOF Request", n.d.,
+              <https://datatracker.ietf.org/doc/bofreq-hardie-media-
+              over-quic/>.
+
+   [MOQ-ml]   "Moq -- Media over QUIC", n.d.,
+              <https://www.ietf.org/mailman/listinfo/moq>.
+
+   [MOQ-uco-113]
+              "Moq -- Use Cases", n.d.,
+              <https://datatracker.ietf.org/meeting/113/materials/
+              slides-113-moq-use-cases-overview-00.pdf>.
+
+   [MPEG-DASH]
+              "ISO/IEC 23009-1:2019 Dynamic adaptive streaming over HTTP
+              (DASH) - Part 1: Media presentation description and
+              segment formats", December 2019,
+              <https://www.iso.org/standard/79329.html>.
+
+   [QUIC-goals]
+              "Initial Charter for QUIC Working Group", October 2016,
+              <https://datatracker.ietf.org/doc/charter-ietf-quic/01/>.
+
+   [RFC2736]  Handley, M. and C. Perkins, "Guidelines for Writers of RTP
+              Payload Format Specifications", BCP 36, RFC 2736,
+              DOI 10.17487/RFC2736, December 1999,
+              <https://www.rfc-editor.org/rfc/rfc2736>.
+
+   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+              Jacobson, "RTP: A Transport Protocol for Real-Time
+              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+              July 2003, <https://www.rfc-editor.org/rfc/rfc3550>.
+
+   [RFC4566]  Handley, M., Jacobson, V., and C. Perkins, "SDP: Session
+              Description Protocol", RFC 4566, DOI 10.17487/RFC4566,
+              July 2006, <https://www.rfc-editor.org/rfc/rfc4566>.
+
+   [RFC6363]  Watson, M., Begen, A., and V. Roca, "Forward Error
+              Correction (FEC) Framework", RFC 6363,
+              DOI 10.17487/RFC6363, October 2011,
+              <https://www.rfc-editor.org/rfc/rfc6363>.
+
+   [RFC6716]  Valin, JM., Vos, K., and T. Terriberry, "Definition of the
+              Opus Audio Codec", RFC 6716, DOI 10.17487/RFC6716,
+              September 2012, <https://www.rfc-editor.org/rfc/rfc6716>.
+
+   [RFC7230]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Message Syntax and Routing",
+              RFC 7230, DOI 10.17487/RFC7230, June 2014,
+              <https://www.rfc-editor.org/rfc/rfc7230>.
+
+   [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
+              Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
+              DOI 10.17487/RFC7540, May 2015,
+              <https://www.rfc-editor.org/rfc/rfc7540>.
+
+   [RFC7826]  Schulzrinne, H., Rao, A., Lanphier, R., Westerlund, M.,
+              and M. Stiemerling, Ed., "Real-Time Streaming Protocol
+              Version 2.0", RFC 7826, DOI 10.17487/RFC7826, December
+              2016, <https://www.rfc-editor.org/rfc/rfc7826>.
+
+   [RFC8095]  Fairhurst, G., Ed., Trammell, B., Ed., and M. Kuehlewind,
+              Ed., "Services Provided by IETF Transport Protocols and
+              Congestion Control Mechanisms", RFC 8095,
+              DOI 10.17487/RFC8095, March 2017,
+              <https://www.rfc-editor.org/rfc/rfc8095>.
+
+   [RFC8216]  Pantos, R., Ed. and W. May, "HTTP Live Streaming",
+              RFC 8216, DOI 10.17487/RFC8216, August 2017,
+              <https://www.rfc-editor.org/rfc/rfc8216>.
+
+   [RFC8298]  Johansson, I. and Z. Sarker, "Self-Clocked Rate Adaptation
+              for Multimedia", RFC 8298, DOI 10.17487/RFC8298, December
+              2017, <https://www.rfc-editor.org/rfc/rfc8298>.
+
+   [RFC8312]  Rhee, I., Xu, L., Ha, S., Zimmermann, A., Eggert, L., and
+              R. Scheffenegger, "CUBIC for Fast Long-Distance Networks",
+              RFC 8312, DOI 10.17487/RFC8312, February 2018,
+              <https://www.rfc-editor.org/rfc/rfc8312>.
+
+   [RFC8698]  Zhu, X., Pan, R., Ramalho, M., and S. Mena, "Network-
+              Assisted Dynamic Adaptation (NADA): A Unified Congestion
+              Control Scheme for Real-Time Media", RFC 8698,
+              DOI 10.17487/RFC8698, February 2020,
+              <https://www.rfc-editor.org/rfc/rfc8698>.
+
+   [RFC8836]  Jesup, R. and Z. Sarker, Ed., "Congestion Control
+              Requirements for Interactive Real-Time Media", RFC 8836,
+              DOI 10.17487/RFC8836, January 2021,
+              <https://www.rfc-editor.org/rfc/rfc8836>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
+
+   [WebRTC]   "Web Real-Time Communications Working Group", n.d.,
+              <https://www.w3.org/groups/wg/webrtc>.
+
+Appendix A.  Security Considerations
+
+   TODO Security
+
+Appendix B.  IANA Considerations
+
+   This document has no IANA actions.
+
+Acknowledgments
+
+   (Your nme could be here ...)
+
+Author's Address
+
+   Spencer Dawkins
+   Tencent America LLC
+   United States of America
+   Email: spencerdawkins.ietf@gmail.com
