@@ -203,9 +203,9 @@ the start of the session.
 
 ### Appropriate Congestion Control {#acc}
 
-The proposed MOQ charter {{MOQ-BOF-request-114}} is silent on the question of appropriate congestion control mechanisms for MOQ. If new congestion control mechanisms are required, they are unlikely to be in scope for a MOQ working group. 
+The proposed MOQ charter {{MOQ-BOF-request-114}} is silent on the question of appropriate congestion control mechanisms for MOQ. If new congestion control mechanisms are required, they are unlikely to be in scope for a MOQ working group.
 
-A question that should be in scope is how a QUIC endpoint knows what congestion control is appropropriate for a QUIC connection carrying MOQ media. A variety of potential mechanisms are possible - QUIC signaling, port numbers, APLN, etc. - but need further investigation within MOQ. 
+A question that should be in scope is how a QUIC endpoint knows what congestion control is appropropriate for a QUIC connection carrying MOQ media. A variety of potential mechanisms are possible - QUIC signaling, port numbers, APLN, etc. - but need further investigation within MOQ.
 
 ### Support Lossless and Lossy Media Transport
 
@@ -249,7 +249,7 @@ it would be beneficial for a protocol to provide such an opportunity (e.g. RTP/Q
 
 ### Architecture and Workflows
 
-The proposed MOQ BOF request {{MOQ-BOF-request-114}} makes a reference to "The MOQ architecture". Is there a starting point for this? {{MOQ-uco-113}}, and other presentations at the IETF 113 BOF used a three-level workflow (from ingest, to syndication, to distribution). The 
+The proposed MOQ BOF request {{MOQ-BOF-request-114}} makes a reference to "The MOQ architecture". Is there a starting point for this? {{MOQ-uco-113}}, and other presentations at the IETF 113 BOF used a three-level workflow (from ingest, to syndication, to distribution). The
 
 We talked about complete workflows - does it look like the proposed charter et. al just assumes you can use the same mechanism for syndication and for streaming? Do we agree with that?
 
