@@ -4,8 +4,8 @@
 
 Media Over QUIC                                               S. Dawkins
 Internet-Draft                                       Tencent America LLC
-Intended status: Informational                              14 June 2022
-Expires: 16 December 2022
+Intended status: Informational                         24 September 2024
+Expires: 28 March 2025
 
 
                Media Over QUIC: Live Media Considerations
@@ -28,7 +28,8 @@ About This Document
 
    Discussion of this document takes place on the Media Over QUIC
    Working Group mailing list (mailto:moq@ietf.org), which is archived
-   at https://mailarchive.ietf.org/arch/browse/moq/.
+   at https://mailarchive.ietf.org/arch/browse/moq/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/moq/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/SpencerDawkins/moq-live-media-considerations.
@@ -48,11 +49,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 December 2022.
+   This Internet-Draft will expire on 28 March 2025.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -189,8 +190,11 @@ Table of Contents
 
    where
 
+   *  "Media" would be something like the output of a codec, or other
+      media sources such as closed-captioning,
+
    *  "Media Format" would be something like an RTP payload format
-      [RFC2736] or ISOBMFF [ISOBMFF],
+      [RFC2736] or an ISOBMFF [ISOBMFF] profile,
 
    *  "Media Transport Protocol" would be something like RTP or DASH
       [MPEG-DASH], and
@@ -254,8 +258,16 @@ Table of Contents
 
 4.5.1.  Appropriate Congestion Control
 
-   This should be about how a QUIC endpoint knows what congestion
-   control is appropropriate - QUIC signaling, port numbers, APLN, etc.
+   The proposed MOQ charter [MOQ-BOF-request-114] is silent on the
+   question of appropriate congestion control mechanisms for MOQ.  If
+   new congestion control mechanisms are required, they are unlikely to
+   be in scope for a MOQ working group.
+
+   A question that should be in scope is how a QUIC endpoint knows what
+   congestion control is appropropriate for a QUIC connection carrying
+   MOQ media.  A variety of potential mechanisms are possible - QUIC
+   signaling, port numbers, APLN, etc. - but need further investigation
+   within MOQ.
 
 4.5.2.  Support Lossless and Lossy Media Transport
 
@@ -316,6 +328,12 @@ Table of Contents
 4.6.  Other Considerations
 
 4.6.1.  Architecture and Workflows
+
+   The proposed MOQ BOF request [MOQ-BOF-request-114] makes a reference
+   to "The MOQ architecture".  Is there a starting point for this?
+   [MOQ-uco-113], and other presentations at the IETF 113 BOF used a
+   three-level workflow (from ingest, to syndication, to distribution).
+   The
 
    We talked about complete workflows - does it look like the proposed
    charter et. al just assumes you can use the same mechanism for
@@ -380,16 +398,16 @@ Table of Contents
    [I-D.draft-engelbart-rtp-over-quic]
               Ott, J. and M. Engelbart, "RTP over QUIC", Work in
               Progress, Internet-Draft, draft-engelbart-rtp-over-quic-
-              03, 12 May 2022, <https://datatracker.ietf.org/doc/html/
-              draft-engelbart-rtp-over-quic-03>.
+              04, 24 June 2022, <https://datatracker.ietf.org/doc/html/
+              draft-engelbart-rtp-over-quic-04>.
 
    [I-D.draft-gruessing-moq-requirements]
               Gruessing, J. and S. Dawkins, "Media Over QUIC - Use Cases
-              and Considerations for Media Transport Protocol Design",
+              and Requirements for Media Transport Protocol Design",
               Work in Progress, Internet-Draft, draft-gruessing-moq-
-              requirements-01, 6 March 2022,
+              requirements-05, 30 May 2023,
               <https://datatracker.ietf.org/doc/html/draft-gruessing-
-              moq-requirements-01>.
+              moq-requirements-05>.
 
    [I-D.draft-hurst-quic-rtp-tunnelling]
               Hurst, S., "QRT: QUIC RTP Tunnelling", Work in Progress,
@@ -398,11 +416,11 @@ Table of Contents
               draft-hurst-quic-rtp-tunnelling-01>.
 
    [I-D.draft-ietf-mops-streaming-opcons]
-              Holland, J., Begen, A., and S. Dawkins, "Operational
+              Holland, J., Begen, A. C., and S. Dawkins, "Operational
               Considerations for Streaming Media", Work in Progress,
-              Internet-Draft, draft-ietf-mops-streaming-opcons-10, 21
-              April 2022, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-mops-streaming-opcons-10>.
+              Internet-Draft, draft-ietf-mops-streaming-opcons-12, 8
+              August 2022, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-mops-streaming-opcons-12>.
 
    [I-D.draft-ietf-quic-datagram]
               Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
@@ -418,45 +436,46 @@ Table of Contents
               http-34>.
 
    [I-D.draft-ietf-quic-multipath]
-              Liu, Y., Ma, Y., Coninck, Q. D., Bonaventure, O., Huitema,
-              C., and M. Kuehlewind, "Multipath Extension for QUIC",
-              Work in Progress, Internet-Draft, draft-ietf-quic-
-              multipath-01, 7 March 2022,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              multipath-01>.
+              Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
+              C., and M. Kühlewind, "Multipath Extension for QUIC", Work
+              in Progress, Internet-Draft, draft-ietf-quic-multipath-10,
+              8 July 2024, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-quic-multipath-10>.
 
    [I-D.draft-ietf-webtrans-overview]
               Vasiliev, V., "The WebTransport Protocol Framework", Work
               in Progress, Internet-Draft, draft-ietf-webtrans-overview-
-              03, 7 March 2022, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-webtrans-overview-03>.
+              08, 25 August 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              webtrans-overview-08>.
 
    [I-D.draft-jennings-moq-quicr-arch]
-              Jennings, C. and S. Nandakumar, "QuicR - Media Delivery
+              Jennings, C. F. and S. Nandakumar, "QuicR - Media Delivery
               Protocol over QUIC", Work in Progress, Internet-Draft,
-              draft-jennings-moq-quicr-arch-00, 4 March 2022,
+              draft-jennings-moq-quicr-arch-01, 11 July 2022,
               <https://datatracker.ietf.org/doc/html/draft-jennings-moq-
-              quicr-arch-00>.
+              quicr-arch-01>.
 
    [I-D.draft-jennings-moq-quicr-proto]
-              Jennings, C. and S. Nandakumar, "QuicR - Media Delivery
-              Protocol over QUIC", Work in Progress, Internet-Draft,
-              draft-jennings-moq-quicr-proto-00, 4 March 2022,
-              <https://datatracker.ietf.org/doc/html/draft-jennings-moq-
-              quicr-proto-00>.
+              Jennings, C. F., Nandakumar, S., and C. Huitema, "QuicR -
+              Media Delivery Protocol over QUIC", Work in Progress,
+              Internet-Draft, draft-jennings-moq-quicr-proto-01, 11 July
+              2022, <https://datatracker.ietf.org/doc/html/draft-
+              jennings-moq-quicr-proto-01>.
 
    [I-D.draft-kpugin-rush]
-              Pugin, K., Frindell, A., Cenzano, J., and J. Weissman,
+              Pugin, K., Frindell, A., Ferret, J. C., and J. Weissman,
               "RUSH - Reliable (unreliable) streaming protocol", Work in
-              Progress, Internet-Draft, draft-kpugin-rush-01, 7 March
-              2022, <https://datatracker.ietf.org/doc/html/draft-kpugin-
-              rush-01>.
+              Progress, Internet-Draft, draft-kpugin-rush-02, 10 May
+              2023, <https://datatracker.ietf.org/doc/html/draft-kpugin-
+              rush-02>.
 
    [I-D.draft-lcurley-warp]
-              Curley, L., "Warp - Segmented Live Video Transport", Work
-              in Progress, Internet-Draft, draft-lcurley-warp-00, 9
-              February 2022, <https://datatracker.ietf.org/doc/html/
-              draft-lcurley-warp-00>.
+              Curley, L., Pugin, K., Nandakumar, S., and V. Vasiliev,
+              "Warp - Live Media Transport over QUIC", Work in Progress,
+              Internet-Draft, draft-lcurley-warp-04, 13 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-lcurley-warp-
+              04>.
 
    [I-D.draft-rtpfolks-quic-rtp-over-quic]
               Ott, J., Even, R., Perkins, C., and V. Singh, "RTP over
@@ -490,7 +509,8 @@ Table of Contents
 
    [MOQ-BOF-request-114]
               "Media over QUIC -- IETF 114 BOF Request", n.d.,
-              <https://datatracker.ietf.org/wg/moq/about/>.
+              <https://datatracker.ietf.org/doc/bofreq-hardie-media-
+              over-quic/>.
 
    [MOQ-ml]   "Moq -- Media over QUIC", n.d.,
               <https://www.ietf.org/mailman/listinfo/moq>.
