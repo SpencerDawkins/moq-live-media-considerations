@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-01T01:38:20.938072+00:00",
+  "timestamp": "2024-10-03T01:23:11.486425+00:00",
   "repo": "SpencerDawkins/moq-live-media-considerations",
   "labels": [
     {
@@ -63,7 +63,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-09-24T19:58:37Z",
-      "updatedAt": "2024-09-24T20:01:33Z",
+      "updatedAt": "2024-10-01T14:53:54Z",
       "baseRepository": "SpencerDawkins/moq-live-media-considerations",
       "baseRefName": "main",
       "baseRefOid": "7fd3494bc705ca931ceeee2e4965f94e8312c28c",
